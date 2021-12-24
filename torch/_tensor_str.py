@@ -375,12 +375,12 @@ def _str_intern(inp):
             suffixes.append('axis=' + str(self.q_per_channel_axis()))
         tensor_str = _tensor_str(self.dequantize(), indent)
     else:
-        if self.is_meta:
+        if not self.has_storage or self.is_meta:
             suffixes.append('size=' + str(tuple(self.shape)))
             if self.dtype != torch.get_default_dtype():
                 suffixes.append('dtype=' + str(self.dtype))
             # TODO: This implies that ellipses is valid syntax for allocating
-            # a meta tensor, which it could be, but it isn't right now
+            # a tensor, which it could be, but it isn't right now
             tensor_str = '...'
         else:
             if self.numel() == 0 and not self.is_sparse:
