@@ -10,6 +10,7 @@
 #include <torch/csrc/jit/frontend/schema_matching.h>
 #include <torch/csrc/jit/frontend/versioned_symbols.h>
 #include <torch/csrc/jit/ir/ir.h>
+#include <torch/csrc/jit/operator_upgraders/upgraders_guard.h>
 
 namespace torch {
 namespace jit {
@@ -319,12 +320,14 @@ struct TORCH_API BuiltinModule : public SugaredValue {
     }
 
     auto sym = Symbol::fromQualString(name + "::" + field);
+#if !ENABLE_UPGRADERS
     if (version.has_value()) {
       // Possibly replaces symbol with another that implements its
       // historic behavior.
       // See note [Versioned Symbols]
       sym = get_symbol_for_version(sym, *version);
     }
+#endif
     return std::make_shared<BuiltinFunction>(sym, c10::nullopt);
   }
 
